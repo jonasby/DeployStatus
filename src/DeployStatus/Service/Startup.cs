@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Web.Http;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles;
 using Owin;
@@ -11,6 +12,7 @@ namespace DeployStatus.Service
     {
         public void Configuration(IAppBuilder app)
         {
+            app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.MapSignalR();
 
             var staticFilesPath = GetStaticFilesPath();
@@ -26,6 +28,15 @@ namespace DeployStatus.Service
             fileServerOptions.DefaultFilesOptions.DefaultFileNames = new[] { "index.html", "index.htm" };
 
             app.UseFileServer(fileServerOptions);
+
+            var config = new HttpConfiguration();
+            config.Routes.MapHttpRoute(
+                name: "DeployStatusApi",
+                routeTemplate: "api/{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+
+            app.UseWebApi(config);
         }
 
         private static string GetStaticFilesPath()
