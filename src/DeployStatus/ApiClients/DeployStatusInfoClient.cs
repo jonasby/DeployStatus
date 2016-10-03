@@ -7,21 +7,25 @@ using log4net;
 
 namespace DeployStatus.ApiClients
 {
+    /// <summary>
+    /// Convenience container for the different APIs used by the DeployStatus project
+    /// </summary>
     public class DeployStatusInfoClient
     {
-        private readonly OctopusClient octopusClient;
-        private readonly TrelloClient trelloClient;
-        private readonly TeamCityClient teamCityClient;
         private readonly ILog log;
 
         // this class should not "own" the resolver, but this does tightly couple it to the client initalisation so on a higher level we don't risk null exceptions.
         public IDeployUserResolver DeployUserResolver { get; }
 
+        public TrelloClient Trello { get; }
+        public OctopusClient Octopus { get; }
+        public TeamCityClient TeamCity { get; }
+
         public DeployStatusInfoClient(DeployStatusConfiguration configuration)
         {
-            octopusClient = new OctopusClient(configuration.Octopus);
-            trelloClient = new TrelloClient(configuration.Trello);
-            teamCityClient = new TeamCityClient(configuration.TeamCity);
+            Octopus = new OctopusClient(configuration.Octopus);
+            Trello = new TrelloClient(configuration.Trello);
+            TeamCity = new TeamCityClient(configuration.TeamCity);
             DeployUserResolver = configuration.DeployUserResolver;
 
             log = LogManager.GetLogger(typeof (DeployStatusInfoClient));
@@ -30,13 +34,13 @@ namespace DeployStatus.ApiClients
         public async Task<IEnumerable<DeployStatusInfo>> GetDeployStatus()
         {
             log.Info("Retrieving environments...");
-            var environments = octopusClient.GetEnvironments().ToList();
+            var environments = Octopus.GetEnvironments().ToList();
 
             log.Info("Queueing and starting getting details tasks...");
             var tasks = new List<Task<DeployStatusInfo>>();
             foreach (var environment in environments)
             {
-                tasks.Add(GetDeployStatusInfo(teamCityClient, environment, trelloClient));
+                tasks.Add(GetDeployStatusInfo(environment));
             }
 
             log.Info("Waiting for tasks to complete.");
@@ -49,10 +53,9 @@ namespace DeployStatus.ApiClients
             throw new Exception("Could not get the deploy statuses in time.");            
         }
 
-        private async Task<DeployStatusInfo> GetDeployStatusInfo(TeamCityClient teamCityClient, OctopusEnvironmentInfo environment,
-            TrelloClient trelloClient)
+        private async Task<DeployStatusInfo> GetDeployStatusInfo(OctopusEnvironmentInfo environment)
         {
-            var buildInfo = (await teamCityClient.GetBuildsContaining(new Version(environment.ReleaseVersion))).ToList();
+            var buildInfo = (await TeamCity.GetBuildsContaining(new Version(environment.ReleaseVersion))).ToList();
 
             var branchName = GetBranchNameFromReleaseNotes(environment.ReleaseNotes);
             if (string.IsNullOrWhiteSpace(branchName) && buildInfo.Any())
@@ -60,9 +63,9 @@ namespace DeployStatus.ApiClients
 
             var branchRelatedTrelloCards = Enumerable.Empty<TrelloCardInfo>();
             if (!string.IsNullOrWhiteSpace(branchName))
-                branchRelatedTrelloCards = await trelloClient.GetCardsLinkedToBranch(branchName);
+                branchRelatedTrelloCards = await Trello.GetCardsLinkedToBranch(branchName);
 
-            var labelRelatedCards = await trelloClient.GetCardsLinkedToLabel(environment.Name);
+            var labelRelatedCards = await Trello.GetCardsLinkedToLabel(environment.Name);
 
             return new DeployStatusInfo(environment, buildInfo, branchRelatedTrelloCards, labelRelatedCards, branchName);
         }

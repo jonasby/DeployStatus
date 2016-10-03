@@ -11,30 +11,34 @@ using Microsoft.AspNet.SignalR;
 
 namespace DeployStatus.SignalR
 {
+    /// <summary>
+    /// Holds all the state used by the web UI. Used as a singleton
+    /// </summary>
     public class DeployStatusState
     {
-        public static readonly Lazy<DeployStatusState> Instance =
-            new Lazy<DeployStatusState>( () => new DeployStatusState(GlobalHost.ConnectionManager.GetHubContext<DeployStatusHub, IDeployStatusClient>()));
-
         private DeploySystemStatus deploySystemStatus = new DeploySystemStatus("Starting system...", DateTime.UtcNow, Enumerable.Empty<Environment>());
+
         private readonly IHubContext<IDeployStatusClient> context;
         private readonly Timer timer;
-        private DeployStatusInfoClient deployStatusInfoClient;
-        private DeployStatusConfiguration deployStatusConfiguration;
+        private readonly DeployStatusInfoClient deployStatusInfoClient;
         private readonly ILog log;
+        private readonly string name;
 
-        private DeployStatusState(IHubContext<IDeployStatusClient> context)
+        public DeployStatusState(
+            IHubContext<IDeployStatusClient> context,
+            DeployStatusInfoClient deployStatusInfoClient, 
+            string name)
         {
             this.context = context;
             timer = new Timer(UpdateDeploySystemStatus);
             log = LogManager.GetLogger(typeof (DeployStatusState));
+            this.deployStatusInfoClient = deployStatusInfoClient;
+            this.name = name;
         }
-
-        public void Start(DeployStatusConfiguration configuration)
+        
+        public void Start()
         {
-            deployStatusInfoClient = new DeployStatusInfoClient(configuration);
-            this.deployStatusConfiguration = configuration;
-            timer.Change(TimeSpan.FromMinutes(0), TimeSpan.FromMilliseconds(-1));
+            timer.Change(TimeSpan.FromMinutes(0), Timeout.InfiniteTimeSpan);
             log.Info("Timer started");
         }
 
@@ -49,7 +53,7 @@ namespace DeployStatus.SignalR
 
                 log.Info("Pushing out update via SignalR.");
                 var newEnvironments = GetEnvironments(status, deployStatusInfoClient.DeployUserResolver);
-                var newDeploySystemStatus = new DeploySystemStatus(deployStatusConfiguration.Name, DateTime.UtcNow, newEnvironments);
+                var newDeploySystemStatus = new DeploySystemStatus(name, DateTime.UtcNow, newEnvironments);
 
                 Interlocked.Exchange(ref deploySystemStatus, newDeploySystemStatus);
 

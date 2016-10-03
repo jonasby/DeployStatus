@@ -9,7 +9,7 @@ using RestSharp.Authenticators;
 
 namespace DeployStatus.ApiClients
 {
-    internal class TrelloClient
+    public class TrelloClient
     {
         private readonly RestClient restClient;
         private readonly TrelloEmailResolver emailResolver;

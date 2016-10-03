@@ -17,6 +17,7 @@ namespace DeployStatus.Service
             log = LogManager.GetLogger(typeof (DeployStatusService));
             deployConfiguration = DeployStatusSettingsSection.Settings.AsDeployConfiguration();
         }
+
         public void Start()
         {
             log.Info("Starting api polling service...");

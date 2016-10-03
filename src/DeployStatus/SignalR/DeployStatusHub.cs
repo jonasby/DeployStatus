@@ -6,7 +6,7 @@ namespace DeployStatus.SignalR
     {
         public DeploySystemStatus GetDeploySystemStatus()
         {
-            return DeployStatusState.Instance.Value.GetDeploySystemStatus();
+            return DeployStatusServiceContainer.State.Value.GetDeploySystemStatus();
         }
     }
 }

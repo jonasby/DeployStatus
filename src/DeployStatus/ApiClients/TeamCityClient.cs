@@ -7,7 +7,7 @@ using RestSharp;
 
 namespace DeployStatus.ApiClients
 {
-    internal class TeamCityClient
+    public class TeamCityClient
     {
         private readonly RestClient restClient;
 
