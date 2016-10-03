@@ -22,7 +22,7 @@ namespace DeployStatus.Service
         {
             log.Info("Starting api polling service...");
 
-            DeployStatusState.Instance.Value.Start(deployConfiguration);
+            DeployStatusServiceContainer.State.Value.Start();
 
             var webAppUrl = deployConfiguration.WebAppUrl;
             log.Info($"Starting web app service on {webAppUrl}...");
@@ -33,7 +33,7 @@ namespace DeployStatus.Service
         public void Stop()
         {
             webApp.Dispose();
-            DeployStatusState.Instance.Value.Stop();
+            DeployStatusServiceContainer.State.Value.Stop();
         }
     }
 }

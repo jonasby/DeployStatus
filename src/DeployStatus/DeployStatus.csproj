@@ -130,7 +130,9 @@
     <Compile Include="ApiClients\TrelloEmailResolver.cs" />
     <Compile Include="ApiClients\TrelloMemberInfo.cs" />
     <Compile Include="Api\DeployController.cs" />
-    <Compile Include="ApiClients\TrelloClientFactory.cs" />
+    <Compile Include="Api\OctopusApiClientFactory.cs" />
+    <Compile Include="Api\TeamCityClientFactory.cs" />
+    <Compile Include="Api\TrelloClientFactory.cs" />
     <Compile Include="Configuration\ComplexDeployUserConfigurationSettingsElement.cs" />
     <Compile Include="Configuration\ComplexDeployUserResolver.cs" />
     <Compile Include="Configuration\DeploymentLinkingConfiguration.cs" />

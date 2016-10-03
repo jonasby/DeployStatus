@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DeployStatus.ApiClients
 {
@@ -11,9 +12,11 @@ namespace DeployStatus.ApiClients
         public IEnumerable<TrelloMemberInfo> Members { get; }
         public DateTime LastActivity { get; }
         public string ListName { get; }
+        public string Desc { get; }
+        public List<string> Labels { get; }
 
         public TrelloCardInfo(string id, string name, string url, IEnumerable<TrelloMemberInfo> members,
-            DateTime lastActivity, string listName)
+            DateTime lastActivity, string listName, string desc, IEnumerable<string> labels)
         {
             Id = id;
             Name = name;
@@ -21,6 +24,8 @@ namespace DeployStatus.ApiClients
             Members = members;
             LastActivity = lastActivity;
             ListName = listName;
+            Desc = desc;
+            Labels = labels.ToList();
         }
 
         protected bool Equals(TrelloCardInfo other)

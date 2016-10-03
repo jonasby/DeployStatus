@@ -40,6 +40,11 @@ namespace DeployStatus.ApiClients
             }
             return builds;
         }
+        
+        public TeamCityDeployDetails EnqueueADeploymentOfBranch(string gitBranchName)
+        {
+            throw new NotImplementedException("soon...");
+        }
 
         private IEnumerable<ChangeInfo> GetLastChanges(TeamCityLastChanges lastChanges)
         {
@@ -127,6 +132,10 @@ namespace DeployStatus.ApiClients
             public string BranchName { get; private set; }
             public string Href { get; private set; }
             public string WebUrl { get; private set; }
+        }
+
+        public class TeamCityDeployDetails
+        {
         }
     }
 }

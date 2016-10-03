@@ -76,17 +76,27 @@ namespace DeployStatus.ApiClients
 
         public async Task<TrelloCardInfo> GetCardByShortId(string shortId)
         {
-            var restRequest = new RestRequest($"cards/{shortId}");
+            // note: returns full description, so don't use it on lots of cards at once
+            var restRequest = new RestRequest($"cards/{shortId}?fields=desc,labels");
 
             var result = await restClient.ExecuteGetTaskAsync<Card>(restRequest);
             if (result.ResponseStatus != ResponseStatus.Completed)
             {
-                log.Warn($"Failed to find card with shortId={shortId}.");
+                log.Warn($"Rest request failed to find card with shortId={shortId}.");
                 return null;
             }
             var card = result.Data;
-            var members = card.Members.Select(y => GetTrelloMemberInfo(y.FullName)).ToList();
-            return new TrelloCardInfo(card.Id, card.Name, card.Url, members, GetLastActivity(card), card.List.Name);
+            if (card == null)
+            {
+                log.Warn($"Rest request returned null for card with shortId={shortId}.");
+                return null;
+            }
+
+            var members = card.Members?.Select(y => GetTrelloMemberInfo(y.FullName)).ToList();
+            var lastActivity = card.DateLastActivity != null ? GetLastActivity(card) : DateTime.MinValue;
+            return new TrelloCardInfo(
+                card.Id, card.Name, card.Url, members ?? Enumerable.Empty<TrelloMemberInfo>(),
+                lastActivity, card.List?.Name, card.Desc, card.Labels.Select(x => x.Name));
         }
 
         private async Task<IEnumerable<TrelloCardInfo>> GetCardsContaining(string searchString)
@@ -95,7 +105,9 @@ namespace DeployStatus.ApiClients
             var trelloCardInfos = searchResult.Cards.Select(x =>
             {
                 var members = x.Members.Select(y => GetTrelloMemberInfo(y.FullName)).ToList();
-                return new TrelloCardInfo(x.Id, x.Name, x.Url, members, GetLastActivity(x), x.List.Name);
+                return new TrelloCardInfo(
+                    x.Id, x.Name, x.Url, members, GetLastActivity(x), x.List.Name,
+                    x.Desc, x.Labels?.Select(y => y.Name));
             });
 
             return trelloCardInfos.ToList();
@@ -143,6 +155,15 @@ namespace DeployStatus.ApiClients
             public string Url { get; private set; }
             public string DateLastActivity { get; private set; }
             public List List { get; private set; }
+            public string Desc { get; private set; }
+            public List<Label> Labels { get; private set; }
+        }
+
+        private class Label
+        {
+            public string Id { get; private set; }
+            public string Color { get; private set; }
+            public string Name { get; private set; }
         }
 
         private class Member
@@ -164,4 +185,5 @@ namespace DeployStatus.ApiClients
             public bool Subscribed { get; private set; }
         }
     }
+
 }
