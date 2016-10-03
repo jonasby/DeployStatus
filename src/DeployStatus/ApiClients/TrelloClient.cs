@@ -74,6 +74,21 @@ namespace DeployStatus.ApiClients
             return await GetCardsContaining(deploymentLinkingSearchString);
         }
 
+        public async Task<TrelloCardInfo> GetCardByShortId(string shortId)
+        {
+            var restRequest = new RestRequest($"cards/{shortId}");
+
+            var result = await restClient.ExecuteGetTaskAsync<Card>(restRequest);
+            if (result.ResponseStatus != ResponseStatus.Completed)
+            {
+                log.Warn($"Failed to find card with shortId={shortId}.");
+                return null;
+            }
+            var card = result.Data;
+            var members = card.Members.Select(y => GetTrelloMemberInfo(y.FullName)).ToList();
+            return new TrelloCardInfo(card.Id, card.Name, card.Url, members, GetLastActivity(card), card.List.Name);
+        }
+
         private async Task<IEnumerable<TrelloCardInfo>> GetCardsContaining(string searchString)
         {
             var searchResult = await ExecuteSearchCards(searchString);
