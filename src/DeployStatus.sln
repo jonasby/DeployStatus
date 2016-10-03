@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployStatus", "DeployStatus\DeployStatus.csproj", "{4951D5E0-5A75-41FB-972A-2EBCA61605A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{2C8CE9B4-CE43-4CE1-B228-C60CA5E23A2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployStatus.UnitTests", "DeployStatus.UnitTests\DeployStatus.UnitTests.csproj", "{3F69AB3C-E561-4858-8B11-7725217AA2EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,8 +22,17 @@ Global
 		{4951D5E0-5A75-41FB-972A-2EBCA61605A7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4951D5E0-5A75-41FB-972A-2EBCA61605A7}.Release-4.5|Any CPU.ActiveCfg = Release|Any CPU
 		{4951D5E0-5A75-41FB-972A-2EBCA61605A7}.Release-4.5|Any CPU.Build.0 = Release|Any CPU
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE}.Release-4.5|Any CPU.ActiveCfg = Release|Any CPU
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE}.Release-4.5|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3F69AB3C-E561-4858-8B11-7725217AA2EE} = {2C8CE9B4-CE43-4CE1-B228-C60CA5E23A2F}
 	EndGlobalSection
 EndGlobal
